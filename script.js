@@ -10,7 +10,7 @@ const btnsOpenModal = document.querySelectorAll('.btn--show-modal'); //It return
 const header = document.querySelector('.header');
 
 const openModal = function (e) {
-  e.prventDeafault();
+  // e.prventDeafault(); //With this openModal windown no open.We don't know about reason.
   modal.classList.remove('hidden');
   overlay.classList.remove('hidden');
 };
@@ -34,32 +34,35 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
-//Creating Element:
+//Creating Element: //Cookies:
 
-const message = document.createElement('div');
-message.classList.add('cookie-message');
+// const message = document.createElement('div');
+// message.classList.add('cookie-message');
 
-message.innerHTML =
-  'Please Accept All Cookies : <button class="btn  btn-close-cookie" >Got it!</button>';
+// message.innerHTML =
+//   'Please Accept All Cookies : <button class="btn  btn-close-cookie" >Got it!</button>';
 
-header.prepend(message);
-header.append(message);
+// header.prepend(message);
+// header.append(message);
 
-//Deleting Element:
+//Deleting Element:  //Remove Cookies
 
-const btnclosecookies = document.querySelector('.btn-close-cookie');
-btnclosecookies.addEventListener('click', function () {
-  message.remove();
-});
+// const btnclosecookies = document.querySelector('.btn-close-cookie');
+// btnclosecookies.addEventListener('click', function () {
+//   message.remove();
+// });
+// setTimeout(()=>{
+//   message.remove();
+// },1000);  //Now we add little functionality is that our cookies message automatically remove after some second if we don't remove manually.
 
 //Smooth Scrolling:
 //First of all select button that we want to click and the select whole section that we apply on smooth scrolling:
 const learnmorebtn = document.querySelector('.btn--scroll-to');
-const sectionone = document.querySelector('#section--1');
+let sectionone = document.querySelector('#section--1');
 
 learnmorebtn.addEventListener('click', function (e) {
   const s1cords = sectionone.getBoundingClientRect();
-  console.log(s1cords); //It returns object that contains some info. about section but not usefull for us.
+  // console.log(s1cords); //It returns object that contains some info. about section .
   //It returns some info. about section elements but it relative to viewports.
   //Top means distance from top of section to top of viewports.
   //Bottom means bottom of section selected and top of viewports.
@@ -71,13 +74,13 @@ learnmorebtn.addEventListener('click', function (e) {
   //X represent the distance from left side that scroll or not . If not then x is zero.
   //These values relative to the viewports not the documents.
 
-  //Now we want to get current scrolling of btn.
 
-  console.log(
-    'Current Scrolling Postion (X/Y)',
-    window.scrollX,
-    window.scrollY
-  );
+  //Now we want to get current scrolling of btn.
+  // console.log(
+  //   'Current Scrolling Postion (X/Y)',
+  //   window.scrollX,
+  //   window.scrollY
+  // );
   //It returns the scroll distance from top and from left. If not scroll then both are zero.
 
   //Now we want to get the height and width of our given viewports.
@@ -96,6 +99,9 @@ learnmorebtn.addEventListener('click', function (e) {
 
   sectionone.scrollIntoView({ behavior: 'smooth' });
 });
+
+
+
 
 //Event Propagation: Event Bubbling ,Event capturing.
 //If we have container and inside container have a div and inside div have a button.
@@ -133,7 +139,7 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
   console.log(e.target);
   if (e.target.classList.contains('nav__link')) {
     const id = e.target.getAttribute('href');
-    console.log(id);
+    // console.log(id);
     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
   }
 });
@@ -194,7 +200,7 @@ const contentcontainer = document.querySelectorAll('.operations__content');
 
 btncontainer.addEventListener('click', e => {
   // const clicked = e.target;
-  // console.log(clicked); //If we click on span number then obviously span return but we retrun must button and apply operations.
+  // console.log(clicked); //If we click on span number then obviously span return but we  want to retrun must button and apply operations.
   //For this we use closet method to select
   const clicked = e.target.closest('.operations__tab'); //It return only buttons
   console.log(clicked);
@@ -216,6 +222,7 @@ btncontainer.addEventListener('click', e => {
 });
 //Now similar content functionaliy implenment.
 
+//New Functionality:
 //On Navigation Fade animation functionaily:
 //First of all select parent of links that is nav.
 const nav = document.querySelector('.nav');
@@ -273,25 +280,45 @@ nav.addEventListener('mouseout', handover.bind(1));
 
 //Sitcky Navigations:
 
-const intialcords = sectionone.getBoundingClientRect();
-console.log(intialcords);
-window.addEventListener('scroll', e => {
-  // console.log(e);
-  // console.log(window.scrollY)
-  if (window.scrollY > intialcords.top) {
-    nav.classList.add('sticky');
-  } else {
+// const intialcords = sectionone.getBoundingClientRect();
+// console.log(intialcords);
+// window.addEventListener('scroll', e => {
+//   // console.log(e);
+//   // console.log(window.scrollY)
+//   if (window.scrollY > intialcords.top) {
+//     nav.classList.add('sticky');
+//   } else {
+//     nav.classList.remove('sticky');
+//   }
+// });
+//It's work properly but not use usaully. For this we use observation intersection api.with javaSciprt.
+//Now we use InterSectionObserver Api to do same work:
+const Header = document.querySelector(".header");
+
+const RevealNav = (entries) => {
+  const [entry] =entries;
+  console.log(entry);
+  if(!entry.isIntersecting)  nav.classList.add('sticky');
+  else{
     nav.classList.remove('sticky');
   }
-});
-//It's work properly but not use usaully. For this we use observation intersection api.with javaSciprt.
+}
+const options ={
+  root : null,
+  threshold:0 , //Means seleected section out of the viewports.
+  rootMargin: '-90px' //Means observer apply before 90 px from top.
+}
 
-//Reveal Section on scrollings:
+const observerNav = new IntersectionObserver(RevealNav,options);
+observerNav.observe(Header);
+
+
+// Reveal Section on scrollings:
 const allsections = document.querySelectorAll('.section');
 
 function Revealsection(entries, option) {
   const [entry] = entries;
-  if (!entry.isIntersecting) return;
+  if (!entry.isIntersecting) return;  //retrun statement immediately exit from function and there is no further line run.
   entry.target.classList.remove('section--hidden');
 }
 
@@ -328,3 +355,7 @@ const observerr = new IntersectionObserver(Revealimage,{
   rootMargin:'-200px'
 })
 imageTargets.forEach((img)=> observerr.observe(img));
+
+
+
+
