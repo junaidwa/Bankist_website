@@ -74,7 +74,6 @@ learnmorebtn.addEventListener('click', function (e) {
   //X represent the distance from left side that scroll or not . If not then x is zero.
   //These values relative to the viewports not the documents.
 
-
   //Now we want to get current scrolling of btn.
   // console.log(
   //   'Current Scrolling Postion (X/Y)',
@@ -99,9 +98,6 @@ learnmorebtn.addEventListener('click', function (e) {
 
   sectionone.scrollIntoView({ behavior: 'smooth' });
 });
-
-
-
 
 //Event Propagation: Event Bubbling ,Event capturing.
 //If we have container and inside container have a div and inside div have a button.
@@ -293,32 +289,31 @@ nav.addEventListener('mouseout', handover.bind(1));
 // });
 //It's work properly but not use usaully. For this we use observation intersection api.with javaSciprt.
 //Now we use InterSectionObserver Api to do same work:
-const Header = document.querySelector(".header");
+const Header = document.querySelector('.header');
 
-const RevealNav = (entries) => {
-  const [entry] =entries;
+const RevealNav = entries => {
+  const [entry] = entries;
   console.log(entry);
-  if(!entry.isIntersecting)  nav.classList.add('sticky');
-  else{
+  if (!entry.isIntersecting) nav.classList.add('sticky');
+  else {
     nav.classList.remove('sticky');
   }
-}
-const options ={
-  root : null,
-  threshold:0 , //Means seleected section out of the viewports.
-  rootMargin: '-90px' //Means observer apply before 90 px from top.
-}
+};
+const options = {
+  root: null,
+  threshold: 0, //Means seleected section out of the viewports.
+  rootMargin: '-90px', //Means observer apply before 90 px from top.
+};
 
-const observerNav = new IntersectionObserver(RevealNav,options);
+const observerNav = new IntersectionObserver(RevealNav, options);
 observerNav.observe(Header);
-
 
 // Reveal Section on scrollings:
 const allsections = document.querySelectorAll('.section');
 
 function Revealsection(entries, option) {
   const [entry] = entries;
-  if (!entry.isIntersecting) return;  //retrun statement immediately exit from function and there is no further line run.
+  if (!entry.isIntersecting) return; //retrun statement immediately exit from function and there is no further line run.
   entry.target.classList.remove('section--hidden');
 }
 
@@ -329,33 +324,83 @@ const observer = new IntersectionObserver(Revealsection, {
 allsections.forEach(function (section) {
   observer.observe(section);
 
-  section.classList.add('section--hidden');
+  // section.classList.add('section--hidden');
 });
-
-
 
 //Lazy Loadin Images:
 const imageTargets = document.querySelectorAll('img[data-src]');
-const Revealimage = (entries,option)=>{
-const [entry]= entries;
+const Revealimage = (entries, option) => {
+  const [entry] = entries;
 
-if(!entry.isIntersecting) return ;
-entry.target.src = entry.target.dataset.src; //only last word not fll data-src:
+  if (!entry.isIntersecting) return;
+  entry.target.src = entry.target.dataset.src; //only last word not fll data-src:
 
-entry.target.addEventListener('load',function(){
-  entry.target.classList.remove('lazy-img')
+  entry.target.addEventListener('load', function () {
+    entry.target.classList.remove('lazy-img');
+  });
+  observer.unobserve(entry.target);
+};
+
+const observerr = new IntersectionObserver(Revealimage, {
+  root: null,
+  threshold: 0,
+  rootMargin: '-200px',
 });
-observer.unobserve(entry.target)
-}
+imageTargets.forEach(img => observerr.observe(img));
 
+//Slider
+const AllSlides = document.querySelectorAll('.slide');
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
+let number = 0;
+let MaxLength = AllSlides.length;
+AllSlides.forEach((s, i) => (s.style.transform = `translateX(${i * 100}%)`));
+btnRight.addEventListener('click', function () {
+  if (number === MaxLength - 1) {
+    number = 0;
+  } else {
+    number++;
+  }
 
-const observerr = new IntersectionObserver(Revealimage,{
-  root:null,
-  threshold:0,
-  rootMargin:'-200px'
-})
-imageTargets.forEach((img)=> observerr.observe(img));
+  AllSlides.forEach(
+    (s, i) => (s.style.transform = `translateX(${(i - number) * 100}%)`)
+  );
+});
+btnLeft.addEventListener('click', function () {
+  if (number === 0) {
+    number = MaxLength - 1;
+  } else {
+    number--;
+  }
 
+  AllSlides.forEach(
+    (s, i) => (s.style.transform = `translateX(${(i - number) * 100}%)`)
+  );
+});
+//Also Working With Keydown:
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowLeft') {
+    if (number === 0) {
+      number = MaxLength - 1;
+    } else {
+      number--;
+    }
 
+    AllSlides.forEach(
+      (s, i) => (s.style.transform = `translateX(${(i - number) * 100}%)`)
+    );
+  }
+  if (e.key === 'ArrowRight') {
+    if (number === MaxLength - 1) {
+      number = 0;
+    } else {
+      number++;
+    }
 
-
+    AllSlides.forEach(
+      (s, i) => (s.style.transform = `translateX(${(i - number) * 100}%)`)
+    );
+  }
+});
+//It's work fine.
+//But at the end of this video we create a function because code reuse.
